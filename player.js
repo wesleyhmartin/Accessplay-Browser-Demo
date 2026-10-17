@@ -22,7 +22,6 @@ const captionDisplay = document.getElementById("captionDisplay");
 const currentTimeSpan = document.getElementById("currentTime");
 const durationTimeSpan = document.getElementById("durationTime");
 const timeContainer = document.getElementById("timeContainer");
-const excludeDomain = document.getElementById("excludeDomain");
 
 let skipSeconds = 10;
 let captionWorker;
@@ -522,26 +521,6 @@ seekGo.onclick = () => {
 
 seekCancel.onclick = () => {
   seekDialog.close();
-};
-
-excludeDomain.onclick = () => {
-  if (document.body.hasAttribute("data-accessplay-demo")) {
-    const original = document.getElementById("originalMedia");
-    if (!original) return;
-    const wasPlaying = !audio.paused;
-    original.src = audio.currentSrc || src;
-    original.currentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
-    original.volume = audio.volume;
-    original.playbackRate = audio.playbackRate;
-    original.hidden = false;
-    document.body.dataset.accessplayDemoExcluded = "true";
-    audio.pause();
-    if (wasPlaying) original.play().catch(() => {});
-    return;
-  }
-  let sourceHostname = "";
-  try { sourceHostname = new URL(src || window.location.href).hostname; } catch {}
-  window.parent.postMessage({ accessPlayAction: "exclude-this-domain", sourceHostname }, "*");
 };
 
 // --- 4. Event Handlers ---
