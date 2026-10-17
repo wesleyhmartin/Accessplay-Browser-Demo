@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AccessPlay browser demo</title>
+  <link rel="stylesheet" href="player.css">
+</head>
+<body data-accessplay-demo>
+  <p>AccessPlay browser demo. Place <code>demo.mp3</code> beside these files and serve this folder from HTTPS or localhost. Captions run in this browser; the extension is not required. The first use downloads the caption model.</p>
+  <audio id="mainMedia" preload="metadata"></audio>
+
+  <div id="player">
+    <button id="playBtn">Play</button>
+    <button id="rewindBtn">Rewind</button>
+    <button id="forwardBtn">Forward</button>
+    <button id="downloadBtn">Download</button>
+    <label class="caption-toggle" title="Keyboard shortcut: C"><input type="checkbox" id="showCaptions" aria-keyshortcuts="C"> Show Captions</label>
+
+    <input type="range" id="volume" min="0" max="100" value="100" aria-label="Volume">
+    <input type="range" id="speed" min="0.5" max="5" step="0.1" value="1" aria-label="Speed">
+
+    <button id="timeContainer" aria-label="0 seconds of 0 seconds" aria-braillelabel="0s/0s">
+      <span id="currentTime" aria-hidden="true">0:00</span>
+      <span aria-hidden="true"> / </span>
+      <span id="durationTime" aria-hidden="true">0:00</span>
+    </button>
+  </div>
+  <div id="captionDisplay" class="caption-empty" role="status" aria-live="polite" aria-atomic="true"></div>
+  <dialog id="seekDialog">
+    <div>
+      <h4>Jump to:</h4>
+      <button id="seekPause">Play</button><br>
+      <label>Hours: <br> <input type="number" id="seekHours" min="0" value="0"></label><br>
+      <label>Minutes: <br> <input type="number" id="seekMinutes" min="0" max="59" value="0"></label><br>
+      <label>Seconds: <br> <input type="number" id="seekSeconds" min="0" max="59" value="0"></label><br>
+      <button id="seekGo">Go</button><br>
+      <button id="seekCancel">Cancel</button>
+      <div id="seekLive" role="status" aria-live="assertive"></div>
+    </div>
+  </dialog>
+
+  <audio id="originalMedia" controls preload="metadata" hidden aria-label="Original audio player"></audio>
+  <div id="ariaLive" role="status" aria-live="polite" style="position:absolute; left:-9999px;" hidden></div>
+
+  <script>
+    (() => {
+      // Small browser-page stand-ins for the extension APIs used by player.js.
+      window.chrome ??= {};
+      chrome.storage ??= {};
+      chrome.storage.sync ??= {};
+      chrome.storage.sync.get ??= (defaults, callback) => callback({ ...defaults });
+      chrome.runtime ??= {};
+      chrome.runtime.id ??= 'accessplay-browser-demo';
+      chrome.runtime.getURL ??= (path) => new URL(path, document.baseURI).href;
+      chrome.runtime.sendMessage ??= (message) => {
+        if (!message.download) return;
+        const download = document.createElement('a');
+        download.href = message.download;
+        download.download = 'demo.mp3';
+        download.click();
+      };
+
+    })();
+  </script>
+  <script src="player.js"></script>
+</body>
+</html>
